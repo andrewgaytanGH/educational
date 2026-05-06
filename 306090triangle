@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>30-60-90 Triangle Drag and Drop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 24px;
+      color: #222;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.6rem;
+    }
+
+    .instructions {
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .activity {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .triangle-area {
+      position: relative;
+      height: 420px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fcfcfc;
+      overflow: hidden;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-zone {
+      position: absolute;
+      min-width: 82px;
+      min-height: 38px;
+      border: 2px dashed #777;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #666;
+    }
+
+    .drop-zone.over {
+      background: #eef6ff;
+      border-color: #1e73be;
+    }
+
+    .drop-zone.correct {
+      border-color: #1d8f3a;
+      background: #eaf8ee;
+    }
+
+    .drop-zone.incorrect {
+      border-color: #c53030;
+      background: #fff0f0;
+    }
+
+    /* Position each drop zone near the corresponding side */
+    #short-leg-zone {
+      left: 102px;
+      top: 220px;
+    }
+
+    #long-leg-zone {
+      left: 260px;
+      top: 345px;
+    }
+
+    #hypotenuse-zone {
+      left: 335px;
+      top: 170px;
+    }
+
+    .choices {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fafafa;
+    }
+
+    .choices h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    .draggable {
+      padding: 10px 14px;
+      margin: 10px 0;
+      border-radius: 8px;
+      background: white;
+      border: 1px solid #bbb;
+      cursor: grab;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      user-select: none;
+    }
+
+    .draggable:active {
+      cursor: grabbing;
+    }
+
+    .buttons {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      background: #1e73be;
+      color: white;
+    }
+
+    button.secondary {
+      background: #666;
+    }
+
+    #feedback {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f1f1f1;
+      min-height: 24px;
+      line-height: 1.4;
+    }
+
+    .angle-label {
+      font-size: 18px;
+      font-weight: bold;
+      fill: #222;
+    }
+
+    .small-note {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 760px) {
+      .activity {
+        grid-template-columns: 1fr;
+      }
+
+      .triangle-area {
+        height: 360px;
+      }
+
+      #short-leg-zone {
+        left: 70px;
+        top: 195px;
+      }
+
+      #long-leg-zone {
+        left: 210px;
+        top: 300px;
+      }
+
+      #hypotenuse-zone {
+        left: 250px;
+        top: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>30-60-90 Triangle: Match the Side Lengths</h1>
+    <p class="instructions">
+      Drag each side length into the correct location on the triangle. Remember: in a 30-60-90 triangle, the side opposite 30° is the shortest side, the side opposite 60° is the longer leg, and the side opposite 90° is the hypotenuse.
+    </p>
+
+    <div class="activity">
+      <div class="triangle-area" aria-label="30-60-90 right triangle activity">
+        <svg viewBox="0 0 600 420" role="img" aria-label="A right triangle with angles 30 degrees, 60 degrees, and 90 degrees">
+          <!-- Triangle points: A(120,340), B(480,340), C(120,132) -->
+          <polygon points="120,340 480,340 120,132" fill="#eef5ff" stroke="#222" stroke-width="4" />
+
+          <!-- Right angle marker -->
+          <polyline points="120,310 150,310 150,340" fill="none" stroke="#222" stroke-width="3" />
+
+          <!-- Angle labels -->
+          <text x="168" y="324" class="angle-label">60°</text>
+          <text x="428" y="324" class="angle-label">30°</text>
+          <text x="132" y="158" class="angle-label">90°</text>
+        </svg>
+
+        <div class="drop-zone" id="short-leg-zone" data-answer="x">short leg</div>
+        <div class="drop-zone" id="long-leg-zone" data-answer="x√3">long leg</div>
+        <div class="drop-zone" id="hypotenuse-zone" data-answer="2x">hypotenuse</div>
+      </div>
+
+      <div class="choices">
+        <h2>Side Lengths</h2>
+        <div class="draggable" draggable="true" id="choice-x" data-value="x">x</div>
+        <div class="draggable" draggable="true" id="choice-xsqrt3" data-value="x√3">x√3</div>
+        <div class="draggable" draggable="true" id="choice-2x" data-value="2x">2x</div>
+
+        <div class="buttons">
+          <button onclick="checkAnswers()">Check Answers</button>
+          <button class="secondary" onclick="resetActivity()">Reset</button>
+        </div>
+
+        <div id="feedback" aria-live="polite"></div>
+        <p class="small-note">
+          Teacher note: this can be embedded in Canvas as an HTML page or iframe-based activity, depending on district settings.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const draggables = document.querySelectorAll('.draggable');
+    const dropZones = document.querySelectorAll('.drop-zone');
+    const choicesBox = document.querySelector('.choices');
+    const feedback = document.getElementById('feedback');
+
+    draggables.forEach(item => {
+      item.addEventListener('dragstart', event => {
+        event.dataTransfer.setData('text/plain', event.target.id);
+      });
+    });
+
+    dropZones.forEach(zone => {
+      zone.addEventListener('dragover', event => {
+        event.preventDefault();
+        zone.classList.add('over');
+      });
+
+      zone.addEventListener('dragleave', () => {
+        zone.classList.remove('over');
+      });
+
+      zone.addEventListener('drop', event => {
+        event.preventDefault();
+        zone.classList.remove('over');
+
+        const draggedId = event.dataTransfer.getData('text/plain');
+        const draggedElement = document.getElementById(draggedId);
+
+        // If the zone already has an answer, move it back to choices.
+        const existing = zone.querySelector('.draggable');
+        if (existing) {
+          choicesBox.insertBefore(existing, document.querySelector('.buttons'));
+        }
+
+        zone.textContent = '';
+        zone.appendChild(draggedElement);
+        zone.classList.remove('correct', 'incorrect');
+        feedback.textContent = '';
+      });
+    });
+
+    choicesBox.addEventListener('dragover', event => {
+      event.preventDefault();
+    });
+
+    choicesBox.addEventListener('drop', event => {
+      event.preventDefault();
+      const draggedId = event.dataTransfer.getData('text/plain');
+      const draggedElement = document.getElementById(draggedId);
+      choicesBox.insertBefore(draggedElement, document.querySelector('.buttons'));
+      feedback.textContent = '';
+    });
+
+    function checkAnswers() {
+      let correctCount = 0;
+
+      dropZones.forEach(zone => {
+        const placed = zone.querySelector('.draggable');
+        zone.classList.remove('correct', 'incorrect');
+
+        if (!placed) {
+          zone.classList.add('incorrect');
+          return;
+        }
+
+        if (placed.dataset.value === zone.dataset.answer) {
+          zone.classList.add('correct');
+          correctCount++;
+        } else {
+          zone.classList.add('incorrect');
+        }
+      });
+
+      if (correctCount === 3) {
+        feedback.textContent = 'Correct! In a 30-60-90 triangle, the side opposite 30° is x, the side opposite 60° is x√3, and the hypotenuse is 2x.';
+      } else {
+        feedback.textContent = 'Not quite. Use the angles to check each side: opposite 30° is x, opposite 60° is x√3, and opposite 90° is 2x.';
+      }
+    }
+
+    function resetActivity() {
+      const labels = {
+        'short-leg-zone': 'short leg',
+        'long-leg-zone': 'long leg',
+        'hypotenuse-zone': 'hypotenuse'
+      };
+
+      dropZones.forEach(zone => {
+        const placed = zone.querySelector('.draggable');
+        if (placed) {
+          choicesBox.insertBefore(placed, document.querySelector('.buttons'));
+        }
+        zone.textContent = labels[zone.id];
+        zone.classList.remove('correct', 'incorrect', 'over');
+      });
+
+      feedback.textContent = '';
+    }
+  </script>
+</body>
+</html>
